@@ -10,7 +10,7 @@ on:
     - cron: '0 13 * * 1-5'
 
 permissions:
-  contents: write  # Grants permissions to save or upload generated artifacts safely
+  contents: write
 
 jobs:
   test-matrix:
@@ -30,22 +30,21 @@ jobs:
       with:
         enable-cache: true
         version: "latest"
-        # 🔥 CRITICAL FIX: Shifts the cache dependency key lookup from uv.lock to pyproject.toml
         cache-dependency-glob: "**/pyproject.toml"
 
     - name: Provision Python Interpreter Env
       run: uv python install ${{ matrix.python-version }}
 
     - name: Resolve Project Dependencies and Bind Workspace
-      # ⚠️ Note: Removed '--frozen' flag to allow dynamic resolution if uv.lock does not exist
-      run: uv sync
+      # 🔥 FIX: Forces uv to install the 'dev' group containing pytest into the virtual env
+      run: uv sync --all-groups
 
     - name: Execute Deterministic Pytest Suite
       run: uv run pytest
 
   unsupervised-benchmark:
     name: Unsupervised Performance Profiling Run
-    needs: test-matrix  # Structural Gate: Prevents profiling broken builds if unit tests fail
+    needs: test-matrix
     runs-on: ubuntu-latest
     
     steps:
@@ -57,7 +56,6 @@ jobs:
       with:
         enable-cache: true
         version: "latest"
-        # 🔥 CRITICAL FIX: Identical path intercept alignment applied here
         cache-dependency-glob: "**/pyproject.toml"
 
     - name: Provision Absolute Reference Multi-Interpreters
@@ -68,8 +66,8 @@ jobs:
         uv python install 3.14t
 
     - name: Build and Sync Local Wheel Context
-      # ⚠️ Note: Removed '--frozen' flag here as well to guarantee clean local workspace synchronization
-      run: uv sync
+      # 🔥 FIX: Keeps local dev groups isolated from production benchmark execution environments
+      run: uv sync --all-groups
 
     - name: Execute Default Active Context Profiling Pool (8-Threads)
       run: |
