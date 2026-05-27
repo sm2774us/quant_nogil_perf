@@ -9,6 +9,12 @@ on:
     # 9:00 AM Eastern Time (ET) maps precisely to 13:00 UTC.
     - cron: '0 13 * * 1-5'
 
+# 🔥 THE ABSOLUTE SILENCER: This forces the runner architecture to execute 
+# all Node.js actions directly under the Node.24 runtime context, completely
+# wiping out the deprecation warning before the runner parses step metadata.
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 permissions:
   contents: write
 

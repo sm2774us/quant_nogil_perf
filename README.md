@@ -1,8 +1,9 @@
 # 📈 Quant NoGIL Performance Suite 🚀
 
-[![CI Multi-Toolchain Pipeline](https://github.com/quant-pod/quant_nogil_perf/actions/workflows/ci.yml/badge.svg)](https://github.com/quant-pod/quant_nogil_perf/actions)
+[![Institutional Multi-Toolchain & Performance Benchmarking Pipeline](https://github.com/sm2774us/quant_nogil_perf/actions/workflows/ci.yml/badge.svg)](https://github.com/sm2774us/quant_nogil_perf/actions/workflows/ci.yml)
 [![Python Version Support](https://img.shields.io/badge/python-3.13%20%7C%203.14-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+
 
 An institutional-grade execution engineering framework designed to map, benchmark, and mathematically profile multi-core latency and lock contention scaling across **Python 3.13** and **Python 3.14** standard (GIL-bound) and free-threaded (NoGIL) execution engines.
 
