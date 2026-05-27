@@ -1,4 +1,4 @@
-name: CI Multi-Toolchain Pipeline
+name: Institutional Multi-Toolchain & Performance Benchmarking Pipeline
 
 on:
   push:
@@ -7,8 +7,6 @@ on:
     branches: [ main, master ]
   schedule:
     # 9:00 AM Eastern Time (ET) maps precisely to 13:00 UTC.
-    # CRON Format: minute hour day-of-month month day-of-week
-    # '1-5' restricts the trigger exclusively to Monday through Friday.
     - cron: '0 13 * * 1-5'
 
 permissions:
@@ -16,11 +14,11 @@ permissions:
 
 jobs:
   test-matrix:
+    name: Core Test Verification Matrix
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        # Testing across standard execution runtimes and explicit free-threaded runtimes
         python-version: ["3.13", "3.13t", "3.14", "3.14t"]
 
     steps:
@@ -32,19 +30,22 @@ jobs:
       with:
         enable-cache: true
         version: "latest"
+        # 🔥 CRITICAL FIX: Shifts the cache dependency key lookup from uv.lock to pyproject.toml
+        cache-dependency-glob: "**/pyproject.toml"
 
     - name: Provision Python Interpreter Env
       run: uv python install ${{ matrix.python-version }}
 
     - name: Resolve Project Dependencies and Bind Workspace
-      run: uv sync --frozen
+      # ⚠️ Note: Removed '--frozen' flag to allow dynamic resolution if uv.lock does not exist
+      run: uv sync
 
     - name: Execute Deterministic Pytest Suite
       run: uv run pytest
 
   unsupervised-benchmark:
     name: Unsupervised Performance Profiling Run
-    needs: test-matrix
+    needs: test-matrix  # Structural Gate: Prevents profiling broken builds if unit tests fail
     runs-on: ubuntu-latest
     
     steps:
@@ -56,6 +57,8 @@ jobs:
       with:
         enable-cache: true
         version: "latest"
+        # 🔥 CRITICAL FIX: Identical path intercept alignment applied here
+        cache-dependency-glob: "**/pyproject.toml"
 
     - name: Provision Absolute Reference Multi-Interpreters
       run: |
@@ -65,7 +68,8 @@ jobs:
         uv python install 3.14t
 
     - name: Build and Sync Local Wheel Context
-      run: uv sync --frozen
+      # ⚠️ Note: Removed '--frozen' flag here as well to guarantee clean local workspace synchronization
+      run: uv sync
 
     - name: Execute Default Active Context Profiling Pool (8-Threads)
       run: |
