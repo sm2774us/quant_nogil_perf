@@ -1,0 +1,21 @@
+[run]
+# Restrict profiling visibility solely to target library modules
+source = src/quant_nogil_perf
+branch = True
+omit =
+    tests/*
+    setup.py
+
+[report]
+# Configure visualization presentation parameters
+show_missing = True
+skip_covered = False
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    if __name__ == "__main__":
+    raise NotImplementedError
+
+[html]
+# Establish disk targets for coverage log assets
+directory = htmlcov

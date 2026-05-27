@@ -1,0 +1,101 @@
+name: CI Multi-Toolchain Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  schedule:
+    # 9:00 AM Eastern Time (ET) maps precisely to 13:00 UTC.
+    # CRON Format: minute hour day-of-month month day-of-week
+    # '1-5' restricts the trigger exclusively to Monday through Friday.
+    - cron: '0 13 * * 1-5'
+
+permissions:
+  contents: write  # Grants permissions to save or upload generated artifacts safely
+
+jobs:
+  test-matrix:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Testing across standard execution runtimes and explicit free-threaded runtimes
+        python-version: ["3.13", "3.13t", "3.14", "3.14t"]
+
+    steps:
+    - name: Check out Repository Source
+      uses: actions/checkout@v4
+
+    - name: Install Astral uv Toolchain
+      uses: astral-sh/setup-uv@v3
+      with:
+        enable-cache: true
+        version: "latest"
+
+    - name: Provision Python Interpreter Env
+      run: uv python install ${{ matrix.python-version }}
+
+    - name: Resolve Project Dependencies and Bind Workspace
+      run: uv sync --frozen
+
+    - name: Execute Deterministic Pytest Suite
+      run: uv run pytest
+
+  unsupervised-benchmark:
+    name: Unsupervised Performance Profiling Run
+    needs: test-matrix
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Check out Repository Source
+      uses: actions/checkout@v4
+
+    - name: Install Astral uv Toolchain
+      uses: astral-sh/setup-uv@v3
+      with:
+        enable-cache: true
+        version: "latest"
+
+    - name: Provision Absolute Reference Multi-Interpreters
+      run: |
+        uv python install 3.13
+        uv python install 3.13t
+        uv python install 3.14
+        uv python install 3.14t
+
+    - name: Build and Sync Local Wheel Context
+      run: uv sync --frozen
+
+    - name: Execute Default Active Context Profiling Pool (8-Threads)
+      run: |
+        uv run quant-bench execute-run \
+          --threads 8 \
+          --workload 5000000 \
+          --output telemetry_active_raw.csv \
+          --plot-dest plots/active_scaling_profile.png
+
+    - name: Execute Comparative Legacy Run (3.13 Standard GIL Baseline)
+      run: |
+        uv run --python 3.13 quant-bench execute-run \
+          --threads 4 \
+          --workload 5000000 \
+          --output results_313_gil.csv \
+          --plot-dest plots/profile_313_gil.png
+
+    - name: Execute Comparative Target Run (3.14t Highly Optimized NoGIL)
+      run: |
+        uv run --python 3.14t quant-bench execute-run \
+          --threads 4 \
+          --workload 5000000 \
+          --output results_314_t.csv \
+          --plot-dest plots/profile_314_t.png
+
+    - name: Persist Benchmark Outputs and Analytical Charts as Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: daily-performance-telemetry-${{ github.sha }}
+        path: |
+          *.csv
+          plots/*.png
+        retention-days: 30
