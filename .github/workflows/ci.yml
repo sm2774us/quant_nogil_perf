@@ -9,8 +9,7 @@ on:
     # 9:00 AM Eastern Time (ET) maps precisely to 13:00 UTC.
     - cron: '0 13 * * 1-5'
 
-# 🔥 CRITICAL FIX 1: Enforce Node.js 24 execution patterns globally across all runner nodes
-# This eliminates the GitHub Actions deprecation warnings completely and ensures future-proof execution.
+# Enforce Node.js 24 execution patterns globally across all runner nodes
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
@@ -69,13 +68,6 @@ jobs:
         uv python install 3.14
         uv python install 3.14t
 
-    # 🔥 CRITICAL FIX 2: Bypassing the virtualenv teardown loop.
-    # Instead of running `uv sync` once and letting `uv run --python` delete/rebuild `.venv` 
-    # repeatedly, we use explicit `uv run --isolated` or pass packages directly into specific targets.
-    # To maximize speed and avoid compiling Wheels on every step, we run benchmarks directly 
-    # with the target Python interpreter flag.
-    
-     malice-prevention-step:
     - name: Execute Default Active Context Profiling Pool (8-Threads)
       run: |
         uv run --active quant-bench execute-run \
