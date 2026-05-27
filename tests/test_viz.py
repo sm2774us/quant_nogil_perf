@@ -5,12 +5,12 @@ from quant_nogil_perf.viz import HighPerformanceVisualizer
 
 @pytest.fixture
 def sample_metrics_dataframe() -> pd.DataFrame:
-    """Provides a standardized data table to populate charting test contexts."""
+    """Provides a standardized data table with clean datatypes to populate charting test contexts."""
     return pd.DataFrame([
-        {"python_version": "3.14", "interpreter_mode": "standard (gil)", "threads": 1, "execution_time": 1.5},
-        {"python_version": "3.14", "interpreter_mode": "standard (gil)", "threads": 2, "execution_time": 3.0},
-        {"python_version": "3.14", "interpreter_mode": "free-threaded (t)", "threads": 1, "execution_time": 1.6},
-        {"python_version": "3.14", "interpreter_mode": "free-threaded (t)", "threads": 2, "execution_time": 1.7},
+        {"python_version": "v3.13", "interpreter_mode": "standard (gil)", "threads": 1, "execution_time": 1.5},
+        {"python_version": "v3.13", "interpreter_mode": "standard (gil)", "threads": 2, "execution_time": 3.0},
+        {"python_version": "v3.14", "interpreter_mode": "free-threaded (t)", "threads": 1, "execution_time": 1.6},
+        {"python_version": "v3.14", "interpreter_mode": "free-threaded (t)", "threads": 2, "execution_time": 1.7},
     ])
 
 def test_ensure_directory_creates_missing_folders(tmp_path: Path):
@@ -25,7 +25,6 @@ def test_plot_scaling_profile_generation(tmp_path: Path, sample_metrics_datafram
     """Ensures line charts are built, styled, and saved to disk properly."""
     target_plot = tmp_path / "plots" / "scaling_profile.png"
     
-    # Run the visualization generation process
     HighPerformanceVisualizer.plot_scaling_profile(
         results_df=sample_metrics_dataframe,
         target_version="3.14",
