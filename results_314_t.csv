@@ -1,0 +1,5 @@
+python_version,interpreter_mode,threads,workload_size,execution_time
+3.14.5,free-threaded (t),1,5000000,1.6161581689999878
+3.14.5,free-threaded (t),2,5000000,2.6463374900000076
+3.14.5,free-threaded (t),3,5000000,3.3564728220000006
+3.14.5,free-threaded (t),4,5000000,4.060397300000005

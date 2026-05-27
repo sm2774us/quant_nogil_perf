@@ -13,7 +13,7 @@ An institutional-grade execution engineering framework designed to map, benchmar
 * [📝 Project Synopsis](#-project-synopsis)
 * [📂 Section-1 : Project Structure](#-section-1--project-structure)
 * [⚙️ Section-2 : Compile, Test, Build and Run Instructions](#%EF%B8%8F-section-2--compile-test-build-and-run-instructions)
-* [🧠 Section-3: Solution Synopsis, Architecture and High-Level Explanation](#-section-3-solution-synopsis-architecture and-high-level-explanation)
+* [🧠 Section-3: Solution Synopsis, Architecture and High-Level Explanation](#-section-3-solution-synopsis-architecture-and-high-level-explanation)
 * [📊 Section-4: Plot-by-Plot (Tied Back to Original Script) Explanation](#-section-4-plot-by-plot-tied-back-to-original-script-explanation)
 * [💻 Section-5: Line-by-Line Solution for Every Single File in Project](#-section-5-line-by-line-solution-for-every-single-file-in-project)
 * [🔬 Section-6: Tabularized Summary Explaining Findings](#-section-6-tabularized-summary-explaining-findings)
@@ -66,6 +66,8 @@ uv python install 3.13 3.13t 3.14 3.14t
 uv venv --python 3.14t
 source .venv/bin/activate
 
+# For windows-11 use
+# .\.venv\Scripts\activate.bat
 ```
 
 ### 🔨 2. Package Compilation & Installation
